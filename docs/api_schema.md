@@ -64,12 +64,12 @@ def create_puppy(puppy: schemas.Puppy) -> schemas.Puppy:
 ## Application
 
 ```python
-from starlette_api.applications import Starlette
+from flama.applications import Flama
 
 from . import views
 
 
-app = Starlette(
+app = Flama(
     title="Puppy Register",               # API title
     version="0.1",                        # API version
     description="A register of puppies",  # API description
@@ -87,16 +87,35 @@ app.add_route("/", views.create_puppy, methods=["POST"])
 components:
   parameters: {}
   schemas:
+    APIError:
+      properties:
+        status_code:
+          description: HTTP status code
+          format: int32
+          title: status_code
+          type: integer
+        detail:
+          description: Error detail
+          title: detail
+          type: string
+        error:
+          description: Exception or error type
+          title: type
+          type: string
+      required:
+      - detail
+      - status_code
+      type: object
     Puppy:
       properties:
-        id:
-          format: int32
-          type: integer
         name:
           type: string
         age:
           format: int32
           minimum: 0
+          type: integer
+        id:
+          format: int32
           type: integer
       type: object
 info:
@@ -126,13 +145,18 @@ paths:
                   $ref: '#/components/schemas/Puppy'
                 type: array
           description: List puppies.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unexpected error.
       summary: List puppies.
       tags:
       - puppy
     post:
       description: Create a new puppy using data validated from request body and add
         it to the collection.
-      parameters: []
       requestBody:
         content:
           application/json:
@@ -155,18 +179,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/Puppy'
           description: Puppy created successfully.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unexpected error.
       summary: Create a new puppy.
       tags:
       - puppy
 tags: []
 ```
 
-You can disable the schema generation by using the `schema` argument.
+You can disable the schema generation by using `None` value for the `schema` argument.
 
 ```python
-from starlette_api.applications import Starlette
+from flama.applications import Flama
 
-app = Starlette(
+app = Flama(
     title="Puppy Register",               # API title
     version="0.1",                        # API version
     description="A register of puppies",  # API description
