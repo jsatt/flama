@@ -36,6 +36,8 @@ class PuppyResource(metaclass=CRUDListResource):
     model = PuppyModel
     schema = PuppySchema
 
+    admin = {"list_columns": ["custom_id", "name"], "order_columns": ["custom_id"]}
+
 
 app = Flama(
     title="Puppy Register",  # API title

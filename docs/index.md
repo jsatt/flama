@@ -130,6 +130,7 @@ It does not have any more hard dependencies, but some of them are necessaries to
 * [`python-forge`][python-forge] - Required for pagination.
 * [`sqlalchemy`][SQLAlchemy] - Required for Generic API resources.
 * [`databases`][databases] - Required for Generic API resources.
+* [`aiofiles`][aiofiles] - Required for Admin site.
 
 You can install all of these with `pip3 install flama[full]`.
 
@@ -154,3 +155,4 @@ discuss it.
 [python-forge]: https://python-forge.readthedocs.io/
 [SQLAlchemy]: https://www.sqlalchemy.org/
 [databases]: https://github.com/encode/databases
+[aiofiles]: https://github.com/Tinche/aiofiles

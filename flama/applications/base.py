@@ -14,9 +14,6 @@ from flama.responses import APIErrorResponse
 from flama.routing import Router
 from flama.types.http import Request, Response
 
-if typing.TYPE_CHECKING:
-    from flama.resources import BaseResource
-
 __all__ = ["BaseApp"]
 
 
@@ -29,34 +26,25 @@ class BaseApp(Starlette):
         if components is None:
             components = []
 
-        # Initialize injector
         self.components = components
 
+        # Initialize injector
+        self.injector = Injector(components=self.components)
+
+        # Initialize router
         self.router = Router(components=components)
         self.app = self.router
+
+        # Initialize middlewares
         self.exception_middleware = ExceptionMiddleware(self.router, debug=self._debug)
         self.error_middleware = ServerErrorMiddleware(self.exception_middleware, debug=self._debug)
 
         # Add exception handler for API exceptions
         self.add_exception_handler(exceptions.HTTPException, self.api_http_exception_handler)
 
-    @property
-    def injector(self):
-        return Injector(components=self.components)
-
     def mount(self, path: str, app: ASGIApp, name: str = None) -> None:
         self.components += getattr(app, "components", [])
         self.router.mount(path, app=app, name=name)
-
-    def add_resource(self, path: str, resource: "BaseResource"):
-        self.router.add_resource(path, resource=resource)
-
-    def resource(self, path: str) -> typing.Callable:
-        def decorator(resource: "BaseResource") -> "BaseResource":
-            self.router.add_resource(path, resource=resource)
-            return resource
-
-        return decorator
 
     def api_http_exception_handler(self, request: Request, exc: HTTPException) -> Response:
         return APIErrorResponse(detail=exc.detail, status_code=exc.status_code, exception=exc)

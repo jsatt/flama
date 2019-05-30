@@ -34,33 +34,37 @@ class SchemaMixin:
         title: str = "",
         version: str = "",
         description: str = "",
-        schema_url: typing.Optional[str] = "/schema/",
-        docs_url: typing.Optional[str] = "/docs/",
-        redoc_url: typing.Optional[str] = None,
+        schema_path: typing.Optional[str] = "/schema/",
+        docs_path: typing.Optional[str] = "/docs/",
+        redoc_path: typing.Optional[str] = None,
     ):
-        self._schema_url = schema_url
+        self._schema_path = schema_path
 
-        if self._schema_url:
+        if self._schema_path:
             # Metadata
             self._schema_title = title
             self._schema_version = version
             self._schema_description = description
 
             # Schema
-            self.add_route(path=schema_url, route=schema, methods=["GET"], include_in_schema=False)
+            self.add_route(path=schema_path, route=schema, methods=["GET"], include_in_schema=False, name="schema")
 
             # Docs (Swagger UI)
-            if docs_url:
-                self.add_route(path=docs_url, route=swagger_ui, methods=["GET"], include_in_schema=False)
+            if docs_path:
+                self.add_route(
+                    path=docs_path, route=swagger_ui, methods=["GET"], include_in_schema=False, name="schema-docs"
+                )
 
             # Redoc
-            if redoc_url:
-                self.add_route(path=redoc_url, route=redoc, methods=["GET"], include_in_schema=False)
+            if redoc_path:
+                self.add_route(
+                    path=redoc_path, route=redoc, methods=["GET"], include_in_schema=False, name="schema-redoc"
+                )
 
     @property
     def schema_generator(self):
         if not hasattr(self, "_schema_generator"):
-            assert getattr(self, "_schema_url", None), "Schema generation is disabled"
+            assert getattr(self, "_schema_path", None), "Schema generation is disabled"
 
             self._schema_generator = SchemaGenerator(
                 title=self._schema_title, version=self._schema_version, description=self._schema_description

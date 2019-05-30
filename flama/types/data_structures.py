@@ -29,7 +29,9 @@ __all__ = [
     "Model",
     "PrimaryKey",
     "ResourceMeta",
+    "ResourceAdmin",
     "ResourceMethodMeta",
+    "ResourceRegistryItem",
     "HTTPMethod",
     "APIError",
 ]
@@ -77,6 +79,11 @@ class Model(typing.NamedTuple):
     primary_key: PrimaryKey
 
 
+class ResourceAdmin(typing.NamedTuple):
+    list_columns: typing.Sequence[str]
+    order_columns: typing.Sequence[str]
+
+
 class ResourceMeta(typing.NamedTuple):
     model: Model
     input_schema: marshmallow.Schema
@@ -84,8 +91,7 @@ class ResourceMeta(typing.NamedTuple):
     database: Database
     name: str
     verbose_name: str
-    columns: typing.Sequence[str]
-    order: str
+    admin: ResourceAdmin
 
 
 class ResourceMethodMeta(typing.NamedTuple):
@@ -93,6 +99,11 @@ class ResourceMethodMeta(typing.NamedTuple):
     methods: typing.List[str] = ["GET"]
     name: str = None
     kwargs: typing.Dict[str, typing.Any] = {}
+
+
+class ResourceRegistryItem(typing.NamedTuple):
+    path: str
+    admin: bool
 
 
 HTTPMethod = enum.Enum("HTTPMethod", ["GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"])

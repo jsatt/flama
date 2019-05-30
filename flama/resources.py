@@ -9,7 +9,7 @@ import marshmallow
 from flama.exceptions import HTTPException
 from flama.pagination import Paginator
 from flama.responses import APIResponse
-from flama.types.data_structures import Model, PrimaryKey, ResourceMeta, ResourceMethodMeta
+from flama.types.data_structures import Model, PrimaryKey, ResourceAdmin, ResourceMeta, ResourceMethodMeta
 
 try:
     import sqlalchemy
@@ -78,9 +78,8 @@ class BaseResource(type):
         # Define resource names
         resource_name, verbose_name = mcs._get_resource_name(name, namespace)
 
-        # Default columns and order for admin interface
-        columns = namespace.pop("columns", [model.primary_key.name])
-        order = namespace.pop("order", model.primary_key.name)
+        # Admin settings
+        admin = mcs._get_admin(namespace, model)
 
         # Get input and output schemas
         input_schema, output_schema = mcs._get_schemas(name, namespace, bases)
@@ -92,8 +91,7 @@ class BaseResource(type):
             verbose_name=verbose_name,
             input_schema=input_schema,
             output_schema=output_schema,
-            columns=columns,
-            order=order,
+            admin=admin,
         )
 
         # Create CRUD methods and routes
@@ -160,6 +158,16 @@ class BaseResource(type):
             return Model(table=model, primary_key=PrimaryKey(model_pk_name, model_pk_type))
 
         raise AttributeError(f"{name} model must be a valid SQLAlchemy Table instance or a Model instance")
+
+    @classmethod
+    def _get_admin(cls, namespace: typing.Dict[str, typing.Any], model: Model) -> ResourceAdmin:
+        admin = namespace.pop("admin", {})
+
+        # Default columns and order for admin interface
+        admin["list_columns"] = admin.pop("list_columns", [model.primary_key.name])
+        admin["order_columns"] = admin.pop("order_columns", [model.primary_key.name])
+
+        return ResourceAdmin(**admin)
 
     @classmethod
     def _get_schemas(

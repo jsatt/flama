@@ -1,12 +1,15 @@
 import typing
 
+from starlette.staticfiles import StaticFiles
+
 from flama.applications.base import BaseApp
+from flama.applications.resources import ResourcesMixin
 from flama.applications.schema import SchemaMixin
 
 __all__ = ["Flama"]
 
 
-class Flama(BaseApp, SchemaMixin):
+class Flama(BaseApp, SchemaMixin, ResourcesMixin):
     def __init__(
         self,
         title: typing.Optional[str] = "",
@@ -15,6 +18,7 @@ class Flama(BaseApp, SchemaMixin):
         schema: typing.Optional[str] = "/schema/",
         docs: typing.Optional[str] = "/docs/",
         redoc: typing.Optional[str] = None,
+        admin: typing.Optional[str] = "/admin/",
         *args,
         **kwargs
     ):
@@ -22,5 +26,11 @@ class Flama(BaseApp, SchemaMixin):
 
         # Add schema and docs routes
         self.add_schema_routes(
-            title=title, version=version, description=description, schema_url=schema, docs_url=docs, redoc_url=redoc
+            title=title, version=version, description=description, schema_path=schema, docs_path=docs, redoc_path=redoc
         )
+
+        # Add admin site routes
+        self.add_admin_routes(path=admin)
+
+        # Static
+        self.mount(path="/_flama_static/", app=StaticFiles(packages=["flama"]), name="flama-static")
