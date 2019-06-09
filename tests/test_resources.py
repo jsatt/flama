@@ -97,8 +97,8 @@ class TestCaseBaseResource:
         assert resource._meta.model == Model(table=model, primary_key=PrimaryKey(name="custom_id", type=int))
         assert resource._meta.input_schema == schema
         assert resource._meta.output_schema == schema
-        assert resource._meta.columns == ["custom_id"]
-        assert resource._meta.order == "custom_id"
+        assert resource._meta.admin.columns == ["custom_id"]
+        assert resource._meta.admin.order == "custom_id"
 
     def test_meta_from_inheritance(self, model, schema, database):
         model_ = model

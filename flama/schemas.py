@@ -132,7 +132,7 @@ class SchemaGenerator(schemas.BaseSchemaGenerator):
                                 output_field=route.output_field.get(method.upper()),
                             )
                         )
-            elif isinstance(route, routing.Mount):
+            elif isinstance(route, routing.Mount) and route.routes:
                 endpoints_info.update(self.get_endpoints(route.routes, base_path=route.path))
 
         return endpoints_info

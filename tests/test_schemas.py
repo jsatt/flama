@@ -115,7 +115,6 @@ class TestCaseSchema:
         assert schema["version"] == "0.1"
         assert schema["description"] == "Bar"
 
-    @pytest.mark.wip
     def test_schema_query_params(self, app):
         schema = app.schema["paths"]["/query-param/"]["get"]
         parameters = schema.get("parameters", {})
